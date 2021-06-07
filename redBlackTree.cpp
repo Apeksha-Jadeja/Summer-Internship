@@ -17,7 +17,7 @@ private:
 	RBT_node root;
 	RBT_node RBT;
 
-	void initial(RBT_node node, RBT_node parent) {
+	void RBNew(RBT_node node, RBT_node parent) {
 		node->data = 0;
 		node->parent = parent;
 		node->left = nullptr;
