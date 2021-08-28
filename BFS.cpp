@@ -1,94 +1,111 @@
-#include <iostream>
-#include <queue>
-#include <climits>
-#include <cstring>
+#include <bits/stdc++.h>
 using namespace std;
+#define ROW 9
+#define COL 10
+ 
 
-
-#define M 10
-#define N 10
-
-
-struct Node
+struct Point
 {
-
-    int x, y, dist;
+    int x;
+    int y;
 };
+ 
 
-int row[] = { -1, 0, 0, 1 };
-int col[] = { 0, -1, 1, 0 };
-
-
-bool isValid(int mat[][N], bool visited[][N], int row, int col)
+struct queueNode
 {
-    return (row >= 0) && (row < M) && (col >= 0) && (col < N)
-        && mat[row][col] && !visited[row][col];
+    Point pt;  
+    int dist; 
+};
+ 
+
+bool isValid(int row, int col)
+{
+    return (row >= 0) && (row < ROW) &&
+           (col >= 0) && (col < COL);
 }
+ 
 
+int rowNum[] = {-1, 0, 0, 1};
+int colNum[] = {0, -1, 1, 0};
+ 
 
-void BFS(int mat[][N], int i, int j, int x, int y)
+int BFS(int mat[][COL], Point src, Point dest)
 {
-    bool visited[M][N];
+
+    if (!mat[src.x][src.y] || !mat[dest.x][dest.y])
+        return -1;
+ 
+    bool visited[ROW][COL];
     memset(visited, false, sizeof visited);
-    queue<Node> q;
-    visited[i][j] = true;
-    q.push({ i, j, 0 });
-    int min_dist = INT_MAX;
+     
+
+    visited[src.x][src.y] = true;
+ 
+
+    queue<queueNode> q;
+     
+    queueNode s = {src, 0};
+    q.push(s);
+ 
+  
     while (!q.empty())
     {
-        Node node = q.front();
-        q.pop();
-        int i = node.x, j = node.y, dist = node.dist;
-        if (i == x && j == y)
-        {
-            min_dist = dist;
-            break;
-        }
+        queueNode curr = q.front();
+        Point pt = curr.pt;
 
+        if (pt.x == dest.x && pt.y == dest.y)
+            return curr.dist;
  
-        for (int k = 0; k < 4; k++)
+  
+        q.pop();
+ 
+        for (int i = 0; i < 4; i++)
         {
-         
-            if (isValid(mat, visited, i + row[k], j + col[k]))
+            int row = pt.x + rowNum[i];
+            int col = pt.y + colNum[i];
+             
+       
+            if (isValid(row, col) && mat[row][col] &&
+               !visited[row][col])
             {
                 
-                visited[i + row[k]][j + col[k]] = true;
-                q.push({ i + row[k], j + col[k], dist + 1 });
+                visited[row][col] = true;
+                queueNode Adjcell = { {row, col},
+                                      curr.dist + 1 };
+                q.push(Adjcell);
             }
         }
     }
+ 
 
-    if (min_dist != INT_MAX)
-    {
-        cout << "The shortest path from source to destination "
-            "has length " << min_dist;
-    }
-    else {
-        cout << "Destination can't be reached from a given source";
-    }
+    return -1;
 }
+ 
 
 int main()
 {
-
-    int mat[M][N] =
+    int mat[ROW][COL] =
     {
-        { 1, 1, 1, 1, 1, 0, 0, 1, 1, 1 },
-        { 0, 1, 1, 1, 1, 1, 0, 1, 0, 1 },
-        { 0, 0, 1, 0, 1, 1, 1, 0, 0, 1 },
-        { 1, 0, 1, 1, 1, 0, 1, 1, 0, 1 },
-        { 0, 0, 0, 1, 0, 0, 0, 1, 0, 1 },
-        { 1, 0, 1, 1, 1, 0, 0, 1, 1, 0 },
-        { 0, 0, 0, 0, 1, 0, 0, 1, 0, 1 },
-        { 0, 1, 1, 1, 1, 1, 1, 1, 0, 0 },
-        { 1, 1, 1, 1, 1, 0, 0, 1, 1, 1 },
-        { 0, 0, 1, 0, 0, 1, 1, 0, 0, 1 },
+        { 1, 0, 1, 1, 1, 1, 0, 1, 1, 1 },
+        { 1, 0, 1, 0, 1, 1, 1, 0, 1, 1 },
+        { 1, 1, 1, 0, 1, 1, 0, 1, 0, 1 },
+        { 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 },
+        { 1, 1, 1, 0, 1, 1, 1, 0, 1, 0 },
+        { 1, 0, 1, 1, 1, 1, 0, 1, 0, 0 },
+        { 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+        { 1, 0, 1, 1, 1, 1, 0, 1, 1, 1 },
+        { 1, 1, 0, 0, 0, 0, 1, 0, 0, 1 }
     };
-
-   
-    BFS(mat, 0, 0, 7, 5);
-
+ 
+    Point source = {0, 0};
+    Point dest = {3, 4};
+ 
+    int dist = BFS(mat, source, dest);
+ 
+    if (dist != -1)
+        cout << "Shortest Path is " << dist ;
+    else
+        cout << "Shortest Path doesn't exist";
+ 
     return 0;
 }
-
-
